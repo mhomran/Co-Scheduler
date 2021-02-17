@@ -58,12 +58,10 @@ static void SigintHandler(int, siginfo_t*, void*);
 * Function : Sch_Init()
 *//**
 * \b Description:
-*
 * This function is used to initialize the scheduler. It should be
 * called before any usage of the sheduler functions.
 *
 * PRE-CONDITION: 1000 > tick value > 0 <br>
-*
 * POST-CONDITION: The scheduler module is set up.
 *
 * @return void
@@ -123,12 +121,10 @@ void Sch_Init(void)
 * Function : Sch_DispatchTasks()
 *//**
 * \b Description:
-*
 * This function is used to dispatch/call the tasks that're due to run.
 *
 * PRE-CONDITION: Sch_Init() is called <br>
 * PRE-CONDITION: Any task duration must < tick <br>
-* 
 * POST-CONDITION: If There's a task that's due will run. Then the CPU will go to sleep.
 * The CPU will wakeup in the next tick.
 *
@@ -137,12 +133,10 @@ void Sch_Init(void)
 * \b Example:
 * @code
 * Sch_Init();
-* 
 * Sch_DispatchTasks();
 * @endcode
 *
 * @see Sch_Init
-*
 **********************************************************************/
 void Sch_DispatchTasks(void)
 {
@@ -165,11 +159,9 @@ void Sch_DispatchTasks(void)
 * Function : Sch_GoToSleep()
 *//**
 * \b Description:
-*
 * Utility function used to make CPU enter sleep mode. It's invoked inside Sch_DispatchTasks
 *
 * PRE-CONDITION: Sch_Init() is called <br>
-* 
 * POST-CONDITION: The CPU enters into sleep mode.
 *
 * @return void
@@ -177,7 +169,6 @@ void Sch_DispatchTasks(void)
 * \b Example:
 * @code
 * Sch_Init();
-* 
 * Sch_DispatchTasks();
 * @endcode
 *
@@ -198,7 +189,6 @@ static void Sch_GoToSleep(void)
 * This function is used to add task to the scheduler. 
 *
 * PRE-CONDITION: Sch_Init() is called <br>
-*
 * POST-CONDITION: The task will be added to the scheduler.
 *
 * @param Function a function pointer to the task function.
@@ -210,7 +200,6 @@ static void Sch_GoToSleep(void)
 * \b Example:
 * @code
 * Sch_Init();
-* 
 * Sch_AddTask(count, 0, 10); // Make a task starting at 0 tick with period 10 ticks. 
 * @endcode
 *
@@ -246,7 +235,6 @@ uint8_t Sch_AddTask(void (*Function)(),
 * This function is used to delete a task from the scheduler. 
 *
 * PRE-CONDITION: Sch_Init() is called <br>
-*
 * POST-CONDITION: The task will be deleted.
 *
 * @param TaskId The id of the task to be deleted.
@@ -256,9 +244,7 @@ uint8_t Sch_AddTask(void (*Function)(),
 * \b Example:
 * @code
 * Sch_Init();
-* 
 * uint8_t taskId = Sch_AddTask(count, 0, 10); 
-* 
 * Sch_DeleteTask(taskId);
 * @endcode
 *
@@ -282,7 +268,6 @@ void Sch_DeleteTask(const uint8_t TaskId)
 * Utility function used to schedule the tasks at every tick. 
 *
 * PRE-CONDITION: Sch_Init() is called <br>
-*
 * POST-CONDITION: The tasks are scheduled according to their configuration.
 *
 * @return void
@@ -331,7 +316,6 @@ static void Sch_Update(void)
 * This function is used to start the schedule module. 
 *
 * PRE-CONDITION: Sch_Init() is called <br>
-*
 * POST-CONDITION: The scheduler starts.
 *
 * @return void
@@ -377,10 +361,10 @@ void Sch_Start(void)
 * @param sig SIGRTMIN signal number
 * @param si information from the signal sender
 * @param uc the context of signal
+*
 * @return void
 *
 * @see Sch_Init
-*
 **********************************************************************/
 static void
 TimerHandler(int sig, siginfo_t *si, void *uc)
@@ -400,12 +384,11 @@ TimerHandler(int sig, siginfo_t *si, void *uc)
 *//**
 * \b Description:
 *
-* Utility function: a handler for the realtime Timer overrunning. It uses SIGINT signal.
+* Utility function: a handler for the SIGINT signal.
 *
 * PRE-CONDITION: Sch_Init() is called <br>
 * PRE-CONDITION: SIGINT is binded to this handler
 * PRE-CONDITION: User press CTRL+C
-*
 * POST-CONDITION: The timer resource is freed, then the program terminates.
 *
 * @param sig SIGINT signal number
@@ -415,7 +398,6 @@ TimerHandler(int sig, siginfo_t *si, void *uc)
 * @return void
 *
 * @see Sch_Init
-*
 **********************************************************************/
 static void
 SigintHandler(int sig, siginfo_t* si, void* uc)
