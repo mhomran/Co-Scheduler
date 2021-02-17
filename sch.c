@@ -12,7 +12,7 @@
 /**********************************************************************
 * Module Preprocessor Constants
 **********************************************************************/
-#define CLOCKID CLOCK_REALTIME
+#define CLOCKID CLOCK_MONOTONIC
 #define SIG SIGRTMIN
 /**********************************************************************
 * Includes
