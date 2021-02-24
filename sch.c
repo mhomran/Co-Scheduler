@@ -35,9 +35,9 @@
 typedef struct 
 {
   void (*Task)(void); /*< a pointer to the task function */
-  uint32_t Delay; /*< Delay (ticks) until the function will (next) be run */
+  sig_atomic_t Delay; /*< Delay (ticks) until the function will (next) be run */
   uint32_t Period; /*< Interval (ticks) between subsequent runs. */
-  int8_t RunMe; /*< Incremented (by scheduler) when task is due to execute */
+  sig_atomic_t RunMe; /*< Incremented (by scheduler) when task is due to execute */
 } TaskConfig_t;
 /**********************************************************************
 * Module Variable Definitions
