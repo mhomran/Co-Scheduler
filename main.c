@@ -27,7 +27,7 @@ int main(void)
   
   while(1)
     {
-      Sch_DispatchTasks();
+      Sch_Update();
     }
   
   return 0;

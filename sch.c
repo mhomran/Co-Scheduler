@@ -48,7 +48,6 @@ static timer_t timerid;
 * Function Prototypes
 **********************************************************************/
 static void Sch_GoToSleep(void);
-static void Sch_Update(void);
 static void TimerHandler(int, siginfo_t*, void*);
 static void SigintHandler(int, siginfo_t*, void*);
 /**********************************************************************
@@ -121,19 +120,17 @@ void Sch_Init(void)
 * Function : Sch_DispatchTasks()
 *//**
 * \b Description:
-* This function is used to dispatch/call the tasks that're due to run.
+* Utility function is used to dispatch/call the tasks that're due to run.
 *
 * PRE-CONDITION: Sch_Init() is called <br>
 * PRE-CONDITION: Any task duration must < tick <br>
-* POST-CONDITION: If There's a task that's due will run. Then the CPU will go to sleep.
-* The CPU will wakeup in the next tick.
+* POST-CONDITION: If There's a task that's due will run. 
 *
 * @return void
 *
 * \b Example:
 * @code
 * Sch_Init();
-* Sch_DispatchTasks();
 * @endcode
 *
 * @see Sch_Init
@@ -151,9 +148,6 @@ void Sch_DispatchTasks(void)
           Config[TaskId].RunMe -= 1; // Reset / reduce RunMe flag
         }
     }
-  
-  // The scheduler enters idle mode at this point
-  Sch_GoToSleep();
 }
 /*********************************************************************
 * Function : Sch_GoToSleep()
@@ -265,7 +259,7 @@ void Sch_DeleteTask(const uint8_t TaskId)
 *//**
 * \b Description:
 *
-* Utility function used to schedule the tasks at every tick. 
+* this function used to schedule the tasks at every tick. 
 *
 * PRE-CONDITION: Sch_Init() is called <br>
 * POST-CONDITION: The tasks are scheduled according to their configuration.
@@ -284,7 +278,7 @@ void Sch_DeleteTask(const uint8_t TaskId)
 * @see Sch_Init
 *
 **********************************************************************/
-static void Sch_Update(void)
+void Sch_Update(void)
 {
   uint8_t Index;
   for (Index = 0; Index < SCH_MAX_TASKS; Index++)
@@ -306,6 +300,11 @@ static void Sch_Update(void)
             }
         }
     }
+  
+  Sch_DispatchTasks();
+  
+  // The scheduler enters idle mode at this point
+  Sch_GoToSleep();
 }
 
 /*********************************************************************
@@ -369,7 +368,7 @@ void Sch_Start(void)
 static void
 TimerHandler(int sig, siginfo_t *si, void *uc)
 {
-  Sch_Update();
+  //Do nothing, just wake up the CPU
 }
 
 /**
