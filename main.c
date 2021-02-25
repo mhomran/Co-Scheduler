@@ -9,15 +9,41 @@
  * @copyright Copyright (c) 2021
  * 
  */
-
+#include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
 #include "sch.h"
 
+static void ClearResources(int sig, siginfo_t* si, void* uc);
 void count1(void);
 void count2(void);
 
 int main(void)
 {
+  /* Establish sigint handler to clear the timer
+  The timer signal should be masked to prevent undesired
+  behaviours */
+  struct sigaction sa;
+
+  sa.sa_flags = SA_SIGINFO;
+  sa.sa_sigaction = ClearResources;
+  if(sigemptyset(&sa.sa_mask) != 0) 
+    {
+      perror("sigemptyset");
+      exit(EXIT_FAILURE);
+    }
+  if(sigaddset(&sa.sa_mask, TIMER_SIG))
+    {
+      perror("sigaddset");
+      exit(EXIT_FAILURE);
+    }
+  if (sigaction(SIGINT, &sa, NULL) == -1)
+    {
+      perror("sigaction");
+      exit(EXIT_FAILURE);
+    }
+
   Sch_Init();
 
   uint8_t task1Id = Sch_AddTask(count1, 0, 100);
@@ -30,7 +56,7 @@ int main(void)
       Sch_Update();
     }
   
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 /**
@@ -53,4 +79,29 @@ void count2(void)
   static int counter = 0;
   printf("TASK2: \t\t%d\n", counter);
   counter++;
+}
+
+/*********************************************************************
+* Function : ClearResources()
+*//**
+* \b Description:
+*
+* Utility function: a handler for the SIGINT signal.
+*
+* PRE-CONDITION: SIGINT is binded to this handler
+* PRE-CONDITION: User press CTRL+C
+* PRE-CONDITION: the timer signal is masked
+* POST-CONDITION: The timer resource is freed, then the program terminates.
+*
+* @param sig SIGINT signal number
+* @param si information from the signal sender
+* @param uc the context of signal
+* 
+* @return void
+**********************************************************************/
+static void
+ClearResources(int sig, siginfo_t* si, void* uc)
+{
+  Sch_Deinit();
+  _exit(EXIT_SUCCESS);
 }

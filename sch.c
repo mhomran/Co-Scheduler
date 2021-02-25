@@ -13,7 +13,6 @@
 * Module Preprocessor Constants
 **********************************************************************/
 #define CLOCKID CLOCK_MONOTONIC
-#define SIG SIGRTMIN
 /**********************************************************************
 * Includes
 **********************************************************************/
@@ -49,7 +48,6 @@ static timer_t timerid;
 **********************************************************************/
 static void Sch_GoToSleep(void);
 static void TimerHandler(int, siginfo_t*, void*);
-static void SigintHandler(int, siginfo_t*, void*);
 /**********************************************************************
 * Function Definitions
 **********************************************************************/
@@ -89,17 +87,7 @@ void Sch_Init(void)
   sa.sa_flags = SA_SIGINFO;
   sa.sa_sigaction = TimerHandler;
   sigemptyset(&sa.sa_mask);
-  if (sigaction(SIG, &sa, NULL) == -1)
-    {
-      perror("sigaction");
-      exit(EXIT_FAILURE);
-    }
-
-  /* Establish handler to clear the timer */
-  sa.sa_flags = SA_SIGINFO;
-  sa.sa_sigaction = SigintHandler;
-  sigemptyset(&sa.sa_mask);
-  if (sigaction(SIGINT, &sa, NULL) == -1)
+  if (sigaction(TIMER_SIG, &sa, NULL) == -1)
     {
       perror("sigaction");
       exit(EXIT_FAILURE);
@@ -107,7 +95,7 @@ void Sch_Init(void)
 
   /* Create the timer */
   sev.sigev_notify = SIGEV_SIGNAL;
-  sev.sigev_signo = SIG;
+  sev.sigev_signo = TIMER_SIG;
   sev.sigev_value.sival_ptr = &timerid;
   if (timer_create(CLOCKID, &sev, &timerid) == -1)
     {
@@ -302,7 +290,7 @@ void Sch_Update(void)
     }
   
   Sch_DispatchTasks();
-  
+
   // The scheduler enters idle mode at this point
   Sch_GoToSleep();
 }
@@ -378,30 +366,9 @@ TimerHandler(int sig, siginfo_t *si, void *uc)
  * @param si information from the signal sender
  * @param uc the context of signal
  */
-/*********************************************************************
-* Function : SigintHandler()
-*//**
-* \b Description:
-*
-* Utility function: a handler for the SIGINT signal.
-*
-* PRE-CONDITION: Sch_Init() is called <br>
-* PRE-CONDITION: SIGINT is binded to this handler
-* PRE-CONDITION: User press CTRL+C
-* POST-CONDITION: The timer resource is freed, then the program terminates.
-*
-* @param sig SIGINT signal number
-* @param si information from the signal sender
-* @param uc the context of signal
-* 
-* @return void
-*
-* @see Sch_Init
-**********************************************************************/
-static void
-SigintHandler(int sig, siginfo_t* si, void* uc)
-{
+/************************* END OF FILE ********************************/
+void 
+Sch_Deinit(void) {
   timer_delete(timerid);
-  _exit(EXIT_SUCCESS);
 }
 /************************* END OF FILE ********************************/
