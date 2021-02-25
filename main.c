@@ -12,18 +12,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
-#include <unistd.h>
 #include "sch.h"
 
 static void ClearResources(int sig, siginfo_t* si, void* uc);
 void count1(void);
 void count2(void);
 
+sig_atomic_t exit_program_flag;
+
 int main(void)
 {
   /* Establish sigint handler to clear the timer
   The timer signal should be masked to prevent undesired
   behaviours */
+  exit_program_flag = 0;
   struct sigaction sa;
 
   sa.sa_flags = SA_SIGINFO;
@@ -53,6 +55,11 @@ int main(void)
   
   while(1)
     {
+      if(exit_program_flag == 1) 
+        {
+          Sch_Deinit();
+          exit(EXIT_SUCCESS);
+        }
       Sch_Update();
     }
   
@@ -102,6 +109,5 @@ void count2(void)
 static void
 ClearResources(int sig, siginfo_t* si, void* uc)
 {
-  Sch_Deinit();
-  _exit(EXIT_SUCCESS);
+  exit_program_flag = 1;
 }
