@@ -403,6 +403,6 @@ static void
 SigintHandler(int sig, siginfo_t* si, void* uc)
 {
   timer_delete(timerid);
-  exit(EXIT_SUCCESS);
+  _exit(EXIT_SUCCESS);
 }
 /************************* END OF FILE ********************************/
