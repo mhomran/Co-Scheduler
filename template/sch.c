@@ -71,6 +71,39 @@ Sch_Init(void)
   //TODO: configure and init the timer used for the scheduler and its interrupt.
 }
 /*********************************************************************
+* Function : Sch_DispatchTasks()
+*//**
+* \b Description:
+* Utility function is used to dispatch/call the tasks that're due to run.
+*
+* PRE-CONDITION: Sch_Init() is called <br>
+* PRE-CONDITION: Any task duration must < tick <br>
+* POST-CONDITION: If There's a task that's due will run. 
+*
+* @return void
+*
+* \b Example:
+* @code
+* Sch_Init();
+* @endcode
+*
+* @see Sch_Init
+**********************************************************************/
+void Sch_DispatchTasks(void)
+{
+  uint8_t TaskId;
+  
+  // Dispatches (runs) the next task (if one is ready)
+  for (TaskId = 0; TaskId < SCH_MAX_TASKS; TaskId++)
+    {
+      if (Config[TaskId].Task != 0x0 && Config[TaskId].RunMe > 0)
+        {
+          (*Config[TaskId].Task)(); // Run the task
+          Config[TaskId].RunMe -= 1; // Reset / reduce RunMe flag
+        }
+    }
+}
+/*********************************************************************
 * Function : Sch_GoToSleep()
 *//**
 * \b Description:
